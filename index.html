@@ -19,11 +19,11 @@
     <h1>Upload PDF Calendar</h1>
     <p>Convert your monthly PDF activity calendar to an iCal (.ics) file.</p>
     <form id="uploadForm">
-      <input type="file" id="pdfInput" accept="application/pdf" required />
-      <br>
-      <button class="btn" type="submit">Convert to iCal</button>
-    </form>
-    <a id="downloadLink" class="btn" href="#" download="converted-calendar.ics">Download iCal File</a>
+  <input type="file" id="pdfInput" accept="application/pdf" required />
+  <br>
+  <button type="submit" id="convertButton">Convert to iCal</button>
+</form>
+<a id="downloadLink" style="display:none;" download="converted-calendar.ics">Download iCal</a>
   </div>
 
 <script>
