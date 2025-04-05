@@ -37,9 +37,12 @@
 
       try {
         // Replace with your backend endpoint that handles PDF to iCal conversion
-        const response = await fetch("https://your-backend-endpoint.com/convert", {
+        const response = await fetch("/.netlify/functions/pdfToIcal", {
           method: "POST",
-          body: formData
+  	  headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+    		isBase64Encoded: true,
+    		body: base64
         });
 
         if (!response.ok) throw new Error("Conversion failed");
