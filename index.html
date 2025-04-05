@@ -26,36 +26,47 @@
     <a id="downloadLink" class="btn" href="#" download="converted-calendar.ics">Download iCal File</a>
   </div>
 
-  <script>
-    document.getElementById("uploadForm").addEventListener("submit", async function (e) {
-      e.preventDefault();
-      const file = document.getElementById("pdfInput").files[0];
-      if (!file) return;
+<script>
+document.getElementById("uploadForm").addEventListener("submit", async function (e) {
+  e.preventDefault();
 
-      const formData = new FormData();
-      formData.append("file", file);
+  const fileInput = document.getElementById("pdfInput");
+  const file = fileInput.files[0];
 
-      try {
-        // Replace with your backend endpoint that handles PDF to iCal conversion
-        const response = await fetch("/.netlify/functions/pdfToIcal", {
-          method: "POST",
-  	  headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-    		isBase64Encoded: true,
-    		body: base64
-        });
+  if (!file) {
+    alert("Please choose a PDF file first.");
+    return;
+  }
 
-        if (!response.ok) throw new Error("Conversion failed");
+  // Convert file to base64
+  const arrayBuffer = await file.arrayBuffer();
+  const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
 
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const downloadLink = document.getElementById("downloadLink");
-        downloadLink.href = url;
-        downloadLink.style.display = "inline-block";
-      } catch (error) {
-        alert("Error: " + error.message);
-      }
+  try {
+    const response = await fetch("/.netlify/functions/pdfToIcal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        isBase64Encoded: true,
+        body: base64
+      })
     });
-  </script>
+
+    if (!response.ok) {
+      throw new Error("Server error: " + response.statusText);
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+
+    const downloadLink = document.getElementById("downloadLink");
+    downloadLink.href = url;
+    downloadLink.style.display = "inline-block";
+  } catch (error) {
+    alert("Error: " + error.message);
+  }
+});
+</script>
+
 </body>
 </html>
