@@ -9,17 +9,11 @@ def handler(event, context):
     try:
         if not event.get("isBase64Encoded"):
             return {"statusCode": 400, "body": json.dumps({"error": "Invalid encoding"})}
-
-        # Decode PDF file from base64
         file_content = base64.b64decode(event["body"])
         file_stream = io.BytesIO(file_content)
-
-        # Parse events from PDF (placeholder logic)
         reader = PdfReader(file_stream)
         text = "\n".join(page.extract_text() for page in reader.pages if page.extract_text())
         events = [{"day": 1, "title": "Sample Event", "time": "14:00"}]
-
-        # Generate iCal file
         now = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
         lines = [
             "BEGIN:VCALENDAR",
@@ -48,7 +42,6 @@ def handler(event, context):
             "END:STANDARD",
             "END:VTIMEZONE"
         ]
-
         for event in events:
             uid = str(uuid.uuid4())
             lines.append("BEGIN:VEVENT")
@@ -66,11 +59,8 @@ def handler(event, context):
                 lines.append(f"DTEND;VALUE=DATE:{dtend.strftime('%Y%m%d')}")
             lines.append(f"SUMMARY:{event['title']}")
             lines.append("END:VEVENT")
-
         lines.append("END:VCALENDAR")
         ics_content = "\r\n".join(lines) + "\r\n"
-
-        # Return file as base64 encoded response
         return {
             "statusCode": 200,
             "headers": {
@@ -80,6 +70,5 @@ def handler(event, context):
             "body": base64.b64encode(ics_content.encode("utf-8")).decode("utf-8"),
             "isBase64Encoded": True
         }
-
     except Exception as e:
         return {"statusCode": 500, "body": json.dumps({"error": str(e)})}

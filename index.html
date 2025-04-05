@@ -44,22 +44,19 @@
   <div class="container">
     <h1>Upload PDF Calendar</h1>
     <p>Convert your monthly PDF activity calendar to an iCal (.ics) file.</p>
-
     <form id="uploadForm">
       <input type="file" id="pdfInput" accept="application/pdf" required />
       <br>
       <button class="btn" type="submit">Convert to iCal</button>
     </form>
-
     <a id="downloadLink" class="btn" href="#" download="converted-calendar.ics">Download iCal File</a>
   </div>
-
   <script>
     function fileToBase64(file) {
       return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = () => {
-          const base64String = reader.result.split(",")[1]; // Remove data: prefix
+          const base64String = reader.result.split(",")[1];
           resolve(base64String);
         };
         reader.onerror = (error) => reject(error);
@@ -69,20 +66,14 @@
 
     document.getElementById("uploadForm").addEventListener("submit", async function (e) {
       e.preventDefault();
-
       const fileInput = document.getElementById("pdfInput");
       const file = fileInput.files[0];
-
       if (!file) {
         alert("Please choose a PDF file first.");
         return;
       }
-
       try {
-        console.log("Converting file to base64...");
         const base64 = await fileToBase64(file);
-
-        console.log("Sending to Netlify function...");
         const response = await fetch("/.netlify/functions/pdfToIcal", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,19 +82,14 @@
             body: base64
           })
         });
-
         if (!response.ok) {
           throw new Error("Server error: " + response.statusText);
         }
-
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
-
         const downloadLink = document.getElementById("downloadLink");
         downloadLink.href = url;
         downloadLink.style.display = "inline-block";
-
-        console.log("Success! Download link is ready.");
       } catch (error) {
         console.error("Conversion error:", error.message);
         alert("Error: " + error.message);
