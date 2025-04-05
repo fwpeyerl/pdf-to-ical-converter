@@ -33,16 +33,21 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
   const fileInput = document.getElementById("pdfInput");
   const file = fileInput.files[0];
 
+  console.log("Submit clicked");
   if (!file) {
+    console.log("No file selected");
     alert("Please choose a PDF file first.");
     return;
   }
 
-  // Convert file to base64
-  const arrayBuffer = await file.arrayBuffer();
-  const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  console.log("File selected:", file.name);
 
   try {
+    const arrayBuffer = await file.arrayBuffer();
+    const base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+
+    console.log("File converted to base64");
+
     const response = await fetch("/.netlify/functions/pdfToIcal", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -52,6 +57,7 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
       })
     });
 
+    console.log("Response status:", response.status);
     if (!response.ok) {
       throw new Error("Server error: " + response.statusText);
     }
@@ -62,11 +68,16 @@ document.getElementById("uploadForm").addEventListener("submit", async function 
     const downloadLink = document.getElementById("downloadLink");
     downloadLink.href = url;
     downloadLink.style.display = "inline-block";
+
+    console.log("Download link ready");
+
   } catch (error) {
+    console.error("Error during conversion:", error.message);
     alert("Error: " + error.message);
   }
 });
 </script>
+
 
 </body>
 </html>
